@@ -8,6 +8,7 @@
 #define LEFT_ROTATE 0
 #define RIGHT_ROTATE 1
 #define GET_PARENT(x) ((x) == NULL ? NULL : (x)->parent)
+#define GET_GRANDPARENT(x) (GET_PARENT(GET_PARENT(x)))
 
 /**
  * enum rb_color_e - Possible color of a Red-Black tree
@@ -44,5 +45,8 @@ typedef struct rb_tree_s
 rb_tree_t *rb_tree_node(rb_tree_t *parent, int value, rb_color_t color);
 int rb_tree_is_valid(const rb_tree_t *tree);
 rb_tree_t *rb_tree_insert(rb_tree_t **tree, int value);
+void left_rotate(rb_tree_t **tree, rb_tree_t *node);
+void right_rotate(rb_tree_t **tree, rb_tree_t *node);
+void rotate(rb_tree_t **tree, rb_tree_t **node, int direction);
 
 #endif /* _RB_TREES_H_ */
