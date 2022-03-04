@@ -48,5 +48,6 @@ rb_tree_t *rb_tree_insert(rb_tree_t **tree, int value);
 void left_rotate(rb_tree_t **tree, rb_tree_t *node);
 void right_rotate(rb_tree_t **tree, rb_tree_t *node);
 void rotate(rb_tree_t **tree, rb_tree_t **node, int direction);
+rb_tree_t *array_to_rb_tree(int *array, size_t size);
 
 #endif /* _RB_TREES_H_ */
