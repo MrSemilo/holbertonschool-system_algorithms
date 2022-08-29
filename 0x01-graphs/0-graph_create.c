@@ -1,5 +1,11 @@
 #include "graphs.h"
 
+/**
+ * graph_create - function name
+ *
+ *Return: pointer to allocated structure or NULL on failure
+ */
+
 graph_t *graph_create(void)
 {
 	graph_t *new_graph;
