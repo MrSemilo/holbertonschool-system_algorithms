@@ -67,6 +67,9 @@ size_t nb_vertices;
 vertex_t *vertices;
 } graph_t;
 
-/* 0-graph_create.c*/
+/* 0*/
 graph_t *graph_create(void);
+
+/* 1*/
+vertex_t *graph_add_vertex(graph_t *graph, const char *str);
 #endif
