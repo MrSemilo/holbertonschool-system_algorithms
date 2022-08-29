@@ -80,4 +80,8 @@ int add_edge_to_vertex(vertex_t *src, vertex_t *dest, edge_t *edge);
 vertex_t *check_if_in_graph(graph_t *graph, const char *string);
 edge_t *find_last_edge(edge_t *edges);
 
+/* 3*/
+void graph_delete(graph_t *graph);
+void delete_edge(edge_t *edges);
+
 #endif
