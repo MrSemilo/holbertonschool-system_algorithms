@@ -1,93 +1,92 @@
+#include <stdbool.h>
+
 #include "graphs.h"
 
-/**
- * breadth_first_traverse - goes through graph using breadth-first algorithm
- * @graph: pointer to graph to traverse, starting from first vertex in list
- * @action: pointer to function to be called for each visited vertex
- * Return: biggest vertex depth, or 0 on failure
- */
-size_t breadth_first_traverse(const graph_t *graph, void (*action)
-	(const vertex_t *v, size_t depth))
-{
-	size_t max_depth = 0;
-
-	if (!graph || !action)
-		return (0);
-	
-	visited = calloc(graph->nb_vertices, sizeof(*visited));
-	if (!visited)
-		return (0);
-	max_depth = dfs(graph->vertices, action, visited, 0, &max_depth);
-	free(visited);
-	return (max_depth);
-}
 
 /**
- * bfs - breadth-first search on graph
- * @vertex: vertex node to perform search
- * @action: pointer to function to be called for each visited vertex
- * @visited: boolean
- * @depth: current depth
- * @max_depth: max_depth
- * Return: max_depth or 0 on failure
+ * bft - perform breadth-first traversal over a graph
+ *
+ * @vertex: pointer to the starting vertex
+ * @action: pointer to a function to apply to each vertex
+ * @queue: pointer to the front of a vertex queue
+ * @queued: pointer to a table of queued vertices
+ * @depths: pointer to a table of vertex depths
+ *
+ * Return: Upon failure, return 0.
+ * Otherwise, return the greatest vertex depth.
  */
-size_t bfs(vertex_t *vertex, void (*action)(const vertex_t *v, size_t depth),
-		int *visited, size_t depth, size_t *max_depth)
+static size_t bft(
+	const vertex_t *vertex, void (*action)(const vertex_t *, size_t),
+	const vertex_t **queue, bool *queued, size_t *depths)
 {
-	queue_t *queue;
+	const vertex_t **queue_rear = queue;
+	const edge_t *edge = NULL;
+	size_t depth = 0;
 
-	queue = calloc(1, sizeof(*queue));
-	if (!queue)
-		return (0);
-	depth = 1;
-	push_to_queue(queue, vertex);
-	visited[vertex->index] = 1;
-
-	while (queue)
+	*queue_rear++ = vertex;
+	queued[vertex->index] = true;
+	depths[vertex->index] = 0;
+	while (queue != queue_rear)
 	{
+		vertex = *queue++;
+		depth = depths[vertex->index];
+		action(vertex, depth);
+		for (edge = vertex->edges; edge; edge = edge->next)
+		{
+			if (!queued[edge->dest->index])
+			{
+				*queue_rear++ = edge->dest;
+				queued[edge->dest->index] = true;
+				depths[edge->dest->index] = depth + 1;
+			}
+		}
 	}
-	return (max_depth);
-}
-
-/**
- * push_to_queue - pushes vertex to queue
- * @queue: pointer to queue
- * @vertex: vertex to push
- */
-void push_to_queue(queue_t *queue, vertex_t *vertex)
-{
-	queue_t *new = malloc(sizeof(*new));
-
-	if (!new)
-		return;
-
-	new->head = vertex;
-	new->tail = NULL;
-	if (!queue->tail)
-		queue->head = new;
-	else
-		queue->tail = new;
-
-	queue->size++;
+	return (depth);
 }
 
 
 /**
- * pop_from_queue - deletes vertex from queue
- * @queue: queue to delete from
- * @vertex: vertex to delete
- * @depth: depth of vertex
+ * breadth_first_traverse - perform breadth-first traversal over a graph
+ *
+ * @graph: pointer to the graph to traverse
+ * @action: pointer to a function to apply to each vertex
+ *
+ * Return: Upon failure, return 0.
+ * Otherwise, return the greatest vertex depth.
  */
-vertex_t pop_from_queue(queue_t **queue, vertex_t *vertex)
+size_t breadth_first_traverse(
+	const graph_t *graph, void (*action)(const vertex_t *, size_t))
 {
-	queue_t *temp;
+	const vertex_t **queue = NULL;
+	bool *queued = NULL;
+	size_t *depths = NULL;
+	size_t depth = 0;
 
+	if (!graph || !graph->vertices)
+	{
+		return (0);
+	}
+	queue = calloc(graph->nb_vertices, sizeof(*queue));
 	if (!queue)
-		return (NULL);
-
-	temp = *queue;
-	*queue = (*queue)->next;
-	vertex = temp->;
-	queue->size = 0;
-	return (*vertex);
+	{
+		return (0);
+	}
+	queued = calloc(graph->nb_vertices, sizeof(*queued));
+	if (!queued)
+	{
+		free(queue);
+		return (0);
+	}
+	depths = calloc(graph->nb_vertices, sizeof(*depths));
+	if (!depths)
+	{
+		free(queue);
+		free(queued);
+		return (0);
+	}
+	depth = bft(graph->vertices, action, queue, queued, depths);
+	free(queue);
+	free(queued);
+	free(depths);
+	return (depth);
 }
